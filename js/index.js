@@ -4,6 +4,17 @@ let attempts = 0;
 let index = 0;
 let timer;
 
+// 키보드 색상 업데이트 함수 추가
+function updateKeyboardColor(key, color) {
+  const keyElement = document.querySelector(
+    `.keyboard-block[data-key='${key}']`
+  );
+  if (keyElement) {
+    keyElement.style.background = color;
+    keyElement.style.color = "white";
+  }
+}
+
 function appStart() {
   const disPalyGameover = () => {
     const div = document.createElement("div");
@@ -38,15 +49,21 @@ function appStart() {
       if (입력한_글자 === 정답_글자) {
         맞은_갯수 += 1;
         block.style.background = "#6AAA64";
-      } else if (정답.includes(입력한_글자)) block.style.background = "#C9B458";
-      else block.style.background = "#787C7E";
+        updateKeyboardColor(입력한_글자, "#6AAA64");
+      } else if (정답.includes(입력한_글자)) {
+        block.style.background = "#C9B458";
+        updateKeyboardColor(입력한_글자, "#C9B458");
+      } else {
+        block.style.background = "#787C7E";
+        updateKeyboardColor(입력한_글자, "#787C7E");
+      }
       block.style.color = "white";
     }
-
     if (맞은_갯수 === 5) {
       gameover();
       return;
     }
+
     nextline();
   };
 
@@ -91,6 +108,28 @@ function appStart() {
     }
     timer = setInterval(setTime, 1000);
   }
+
+  // 키보드 클릭 이벤트 등록
+  document.querySelectorAll(".keyboard-block").forEach((keyBlock) => {
+    keyBlock.addEventListener("click", function () {
+      const key = this.dataset.key;
+      if (!key) return;
+
+      if (key === "ENTER") {
+        handleEnterKey();
+      } else if (key === "BACKSPACE") {
+        handleBackspace();
+      } else if (index < 5) {
+        const thisBlock = document.querySelector(
+          `.board-block[data-index='${attempts}${index}']`
+        );
+        if (thisBlock) {
+          thisBlock.innerText = key;
+          index += 1;
+        }
+      }
+    });
+  });
 
   startTimer();
   window.addEventListener("keydown", handlekeydown);
